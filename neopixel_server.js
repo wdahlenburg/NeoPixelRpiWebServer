@@ -93,13 +93,15 @@ app.get('/pattern', function(req,res){
 			conf.pattern = "iterate";
 			res.type("application/json");
 			res.send(JSON.stringify(conf))
-			iterate(rgb2Int(255,255,255), 50, 1000);
+			setTimeout(function(){iterate(rgb2Int(255,255,255), 50, 500)}, 10000);
+			switchAllLedOff();
 			break;
 		case "rainbow":
 			conf.pattern = "rainbow";
 			res.type("application/json");
 			res.send(JSON.stringify(conf))
-			setTimeout(rainbow(), 10000);
+			setTimeout(rainbow, 10000);
+			switchAllLedOff();
 			break;
 		default:
 			res.type("application/json");
