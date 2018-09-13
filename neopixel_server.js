@@ -93,7 +93,7 @@ app.get('/pattern', function(req,res){
 			conf.pattern = "iterate";
 			res.type("application/json");
 			res.send(JSON.stringify(conf))
-			iterate(rgb2Int(255,255,255), 50, 500);
+			iterate(rgb2Int(255,255,255), 50, 1000);
 			break;
 		case "rainbow":
 			conf.pattern = "rainbow";
@@ -163,13 +163,18 @@ function rgb2Int(r, g, b) {
 
 //Iterate over all of the LEDs with a given color and brightness
 function iterate(color, brightness, delay){
-	for(var i = 0; i < NUM_LEDS; i++){
-		setTimeout(function(){
-			switchAllLedOff();
-			changeLed(i,color,brightness);
-			ws281x.render(pixelData);	
-		}, delay);
-	}
+	var offset = 0;
+	ws281x.setBrightness(brightness);
+	setInterval(function () {
+	  var i=NUM_LEDS;
+	  while(i--) {
+	      pixelData[i] = 0;
+	  }
+	  pixelData[offset] = color;
+
+	  offset = (offset + 1) % NUM_LEDS;
+	  ws281x.render(pixelData);
+	}, delay);
 }
 
 //Continually change colors smoothly. Should be set to a timeout.
