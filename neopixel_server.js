@@ -87,18 +87,26 @@ app.get('/changeLed',function (req,res){
 
 app.get('/pattern', function(req,res){
 	pattern = req.query.id;
+	var conf = new Object();
 	switch(pattern){
 		case "iterate":
+			conf.pattern = "iterate";
+			res.type("application/json");
+			res.send(JSON.stringify(conf))
 			iterate(rgb2Int(255,255,255), 50, 500);
-			res.type("application/json");
-			res.send("{pattern: iterate}")
 			break;
-		case default:
+		case "rainbow":
+			conf.pattern = "rainbow";
 			res.type("application/json");
-			res.send("{pattern: Not Found}");
+			res.send(JSON.stringify(conf))
+			setTimeout(rainbow(), 10000);
+			break;
+		default:
+			res.type("application/json");
+			res.send('{"pattern": "Not Found"}')
 			break;
 	}
-
+	return;
 })
 
 
@@ -161,5 +169,27 @@ function iterate(color, brightness, delay){
 			changeLed(i,color,brightness);
 			ws281x.render(pixelData);	
 		}, delay);
+	}
+}
+
+//Continually change colors smoothly. Should be set to a timeout.
+function rainbow(){
+	var offset = 0;
+	setInterval(function () {
+	  for (var i = 0; i < NUM_LEDS; i++) {
+	    pixelData[i] = colorwheel((offset + i) % 256);
+	  }
+
+	  offset = (offset + 1) % 256;
+	  ws281x.render(pixelData);
+	}, 1000 / 30);
+
+
+	// rainbow-colors, taken from http://goo.gl/Cs3H0v
+	function colorwheel(pos) {
+	  pos = 255 - pos;
+	  if (pos < 85) { return rgb2Int(255 - pos * 3, 0, pos * 3); }
+	  else if (pos < 170) { pos -= 85; return rgb2Int(0, pos * 3, 255 - pos * 3); }
+	  else { pos -= 170; return rgb2Int(pos * 3, 255 - pos * 3, 0); }
 	}
 }
