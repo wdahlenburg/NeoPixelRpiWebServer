@@ -6,6 +6,10 @@ var ledIdInit = 0;
 var initTimes = 4 * 8;
 var app = express();
 
+
+console.log("Listening on port 8083")
+app.listen(8083);
+
 var NUM_LEDS = parseInt(process.argv[2], 10) || 8,
     pixelData = new Uint32Array(NUM_LEDS);
 
@@ -97,8 +101,7 @@ function startupSequence() {
 	if(initTimes === 0) {
 		switchAllLedOff();
 		changeLed(7,redColor,20);
-		//app.listen(8083,'localhost');
-		app.listen(8083);
+		// app.listen(8083);
 	} else 
 		setTimeout(startupSequence, 200);
 }
