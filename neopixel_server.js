@@ -85,6 +85,22 @@ app.get('/changeLed',function (req,res){
 	return;
 });
 
+app.get('/pattern', function(req,res){
+	pattern = req.query.id;
+	switch(pattern){
+		case "iterate":
+			iterate(rgb2Int(255,255,255), 50, 500);
+			res.type("application/json");
+			res.send("{pattern: iterate}")
+			break;
+		case default:
+			res.type("application/json");
+			res.send("{pattern: Not Found}");
+			break;
+	}
+
+})
+
 
 defBrightness();
 
@@ -130,4 +146,20 @@ function defBrightness(){
 
 function rgb2Int(r, g, b) {
   return ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
+}
+
+/*
+*	Start LED pattern methods
+*
+*/
+
+//Iterate over all of the LEDs with a given color and brightness
+function iterate(color, brightness, delay){
+	for(var i = 0; i < NUM_LEDS; i++){
+		setTimeout(function(){
+			switchAllLedOff();
+			changeLed(i,color,brightness);
+			ws281x.render(pixelData);	
+		}, delay);
+	}
 }
